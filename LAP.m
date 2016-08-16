@@ -15,6 +15,9 @@ for i=1:totalFeatures
        if (i-1==j && rem(j,graphWidth)~=0)
            adj(i,j)=1;
        end
+       if i==j+graphHeight || i==j-graphHeight
+           adj(i,j)=1;
+       end
     end
 end
 
@@ -37,7 +40,7 @@ for t=1:2^totalFeatures
         x(i) = 1;
         allOutcomes(t,:) = x;
     end 
-    P(t) = exp( sum(u.*x) + sum(sum(w .* (x' * x) .* adj)) );
+    P(t) = exp( sum(u.*x) + sum(sum(triu(w .* (x' * x) .* adj))) );
     
 end
 
@@ -53,8 +56,43 @@ for i=1:numSamples
 end
 
 
+est_w = zeros(totalFeatures, totalFeatures);
+est_w_num = zeros(totalFeatures, totalFeatures);
+est_u = zeros(1,totalFeatures);
+est_u_num = zeros(1,totalFeatures);
+
+cliques = cell(0);
+
+%%%% fill cliques and cliques_params
 for i=1:totalFeatures
-   for j=i:totalFeatures 
-       
-   end
+    for j=i:totalFeatures
+       if adj(i,j) == 1
+          cliques = [cliques, [i,j]];
+       end
+    end
 end
+%%%%
+
+
+for c=1:length(cliques)
+    %%%% Newton
+    v = cliques{c}(1);
+    u = cliques{c}(2);
+    SS = computeSS(v, u, adj(v,:), adj(u,:),allSamples);
+    
+    theta_0 = zeros(size(SS));
+    theta = my_newton(theta_0,SS,n,v,u,adj(v,:),adj(u,:));
+    est_w(v,u) = est_w_num+theta(1);
+    est_w_num(v,u) = est_w_num(v,u)+1;
+    est_u(v) = est_u(v) + theta(2);
+    est_u_num(v) = est_u_num(v)+1;
+    est_u(u) = est_u(u) + theta(3);
+    est_u_num(u) = est_u_num(u) + 1;
+    %%%%
+end
+%%%%
+%%%% parameter averaging
+est_w_num(est_w_num == 0) = 1;
+est_u_num(est_u_num == 0) = 1;
+est_w = est_w ./ est_w_num;
+est_u = est_u ./ est_u_num;
