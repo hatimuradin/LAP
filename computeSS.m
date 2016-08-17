@@ -9,18 +9,18 @@ function [SS] = computeSS(v,w, adj_v, adj_w, X)
     SS(:,3) = X(:,w);
     index = 4;
     
-    SS(:,index:index+sum(adj_v)) = X(:,(adj_v == 1)) .* repmat(X(:,v),1,sum(adj_v));
+    SS(:,index:index+sum(adj_v) - 1) = X(:,(adj_v == 1)) .* repmat(X(:,v),1,sum(adj_v));
     index = index + sum(adj_v);
     
-    SS(:,index:index+sum(adj_w)) = X(:,(adj_w == 1)) .* repmat(X(:,w),1,sum(adj_w));
+    SS(:,index:index+sum(adj_w) - 1) = X(:,(adj_w == 1)) .* repmat(X(:,w),1,sum(adj_w));
     index = index + sum(adj_w);
     
-    SS(:, index:index+sum(union_adj)) = X(:,union_adj == 1);
+    SS(:, index:index+sum(union_adj) - 1) = X(:,union_adj == 1);
     index = index + sum(union_adj);
     
     f = find(union_adj);
     for i=1:length(f)
-       for j=i+1:lengtj(f)
+       for j=i+1:length(f)
            SS(:, index) = X(:, f(i)).*X(:, f(j));
            index = index + 1;
        end

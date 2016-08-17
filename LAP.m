@@ -81,8 +81,8 @@ for c=1:length(cliques)
     SS = computeSS(v, u, adj(v,:), adj(u,:),allSamples);
     
     theta_0 = zeros(size(SS));
-    theta = my_newton(theta_0,SS,n,v,u,adj(v,:),adj(u,:));
-    est_w(v,u) = est_w_num+theta(1);
+    theta = my_newton(theta_0, SS, size(allSamples, 1), v, u, adj(v,:), adj(u,:),size(allSamples,2));
+    est_w(v,u) = est_w(v,u) + theta(1);
     est_w_num(v,u) = est_w_num(v,u)+1;
     est_u(v) = est_u(v) + theta(2);
     est_u_num(v) = est_u_num(v)+1;
