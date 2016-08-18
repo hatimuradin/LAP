@@ -1,4 +1,4 @@
-function [ESS, CovSS] = computeESS(theta, u, v, adj_v, adj_u, d, logZ)
+function [ESS, CovSS] = computeESS(theta, v, u, adj_v, adj_u, d, logZ)
     
     ESS = zeros(size(theta));
     CovSS = zeros(length(theta),length(theta));
@@ -26,10 +26,10 @@ function [ESS, CovSS] = computeESS(theta, u, v, adj_v, adj_u, d, logZ)
         end 
         x(logical(aux_features)) = y;
 
-        SS_tmp = computeSS(u, v, adj_v, adj_u, x);
+        SS_tmp = computeSS(v, u, adj_v, adj_u, x);
 
         ESS = ESS + exp(theta*SS_tmp' - logZ) * SS_tmp;
-        CovSS = CovSS - exp(theta*SS_tmp' - logZ) * (SS_tmp' * SS_tmp);
+        CovSS = CovSS + exp(theta*SS_tmp' - logZ) * (SS_tmp' * SS_tmp);
 
     end
     

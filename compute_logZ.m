@@ -1,4 +1,4 @@
-function logZ = compute_logZ (theta, u, v, adj_v, adj_u, d)
+function logZ = compute_logZ (theta, v, u, adj_v, adj_u, d)
         
     adj_v(u) = 0;
     adj_u(v) = 0;
@@ -23,7 +23,7 @@ function logZ = compute_logZ (theta, u, v, adj_v, adj_u, d)
         end 
         x(logical(aux_features)) = y;
 
-        SS_tmp = computeSS(u, v, adj_v, adj_u, x);
+        SS_tmp = computeSS(v, u, adj_v, adj_u, x);
         log_sum_tmp(i) = theta*SS_tmp';
     end
     logZ = log_sum_exp(log_sum_tmp, 2);
