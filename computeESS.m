@@ -30,10 +30,6 @@ function [ESS, CovSS] = computeESS(theta, u, v, adj_v, adj_u, d, logZ)
 
         ESS = ESS + exp(theta*SS_tmp' - logZ) * SS_tmp;
         CovSS = CovSS - exp(theta*SS_tmp' - logZ) * (SS_tmp' * SS_tmp);
-        
-        if sum(isnan(ESS)) > 0
-            disp('here');
-        end
 
     end
     

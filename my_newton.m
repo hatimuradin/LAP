@@ -4,10 +4,12 @@ function theta = my_newton(theta_0,SS,n,v,u,adj_v,adj_u,d)
     theta = theta_0;
     
     for iter = 1:MaxIter
+        iter
         logZ = compute_logZ(theta, u, v, adj_u, adj_v, length(adj_v));
         [ESS, CovSS] = computeESS(theta, u, v, adj_v, adj_u, d, logZ);
         grad = (SS - n*ESS)';
-        H = n*CovSS;
+        H = -n*CovSS;
+%         vpa(H);
         delta_theta = -grad'/H;
         %%%% check stop criterion
         lambda2 = -grad'*H^(-1)*grad;

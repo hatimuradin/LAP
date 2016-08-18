@@ -1,5 +1,5 @@
 
-vpa(100);
+% digits(100);
 
 graphHeight = 4;
 graphWidth = 4;
