@@ -112,4 +112,4 @@ figure(1);
 bar([w1' , est_w1']);
 
 figure(2);
-bar([w2(w2 ~= 0) , est_w2(est_w2 ~= 0)]);
+bar([w2(adj ~= 0)]);
