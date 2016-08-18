@@ -8,6 +8,7 @@ function theta = my_newton(theta_0,SS,n,v,u,adj_v,adj_u,d)
         [ESS, CovSS] = computeESS(theta, u, v, adj_v, adj_u, d, logZ);
         grad = (SS - n*ESS)';
         H = n*CovSS;
+        H = vpa(H);
         delta_theta = -grad'/H;
         %%%% check stop criterion
         lambda2 = -grad'*H^(-1)*grad;

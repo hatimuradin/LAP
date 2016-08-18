@@ -1,5 +1,9 @@
-function [Z, ESS, CovSS] = computeZ (theta, u, v, adj_v, adj_u, d)
-        
+function [ESS, CovSS] = computeESS(theta, u, v, adj_v, adj_u, d, logZ)
+    
+    ESS = zeros(size(theta));
+    CovSS = zeros(length(theta),length(theta));
+
+
     adj_v(u) = 0;
     adj_u(v) = 0;
     union_adj = adj_v | adj_u;
@@ -8,10 +12,8 @@ function [Z, ESS, CovSS] = computeZ (theta, u, v, adj_v, adj_u, d)
     aux_features(u) = 1;
     aux_features = logical(aux_features);
         
-    %%%% compute Z and ESS and H
-    Z = 0;
-    ESS = zeros(size(theta));
-    CovSS = zeros(length(theta),length(theta));
+    %%%% compute ESS and CovSS
+
     x = zeros(1, d);
     y = zeros(1,sum(aux_features));
     for i=1:2^(sum(aux_features))
@@ -25,12 +27,16 @@ function [Z, ESS, CovSS] = computeZ (theta, u, v, adj_v, adj_u, d)
         x(logical(aux_features)) = y;
 
         SS_tmp = computeSS(u, v, adj_v, adj_u, x);
-        Z = Z + exp(theta*SS_tmp');
 
-        ESS = ESS + exp(theta*SS_tmp') * SS_tmp;
-        CovSS = CovSS - exp(theta*SS_tmp') * (SS_tmp' * SS_tmp);
+        ESS = ESS + exp(theta*SS_tmp' - logZ) * SS_tmp;
+        CovSS = CovSS - exp(theta*SS_tmp' - logZ) * (SS_tmp' * SS_tmp);
+        
+        if sum(isnan(ESS)) > 0
+            disp('here');
+        end
+
     end
-    ESS = ESS / Z;
-    CovSS = CovSS / Z;
+    
     CovSS = CovSS - ESS'*ESS; 
+
 end
