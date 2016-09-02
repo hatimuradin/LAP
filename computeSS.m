@@ -1,31 +1,42 @@
-function [SS] = computeSS(v,u, adj_v, adj_u, X)
-    adj_v(u) = 0;
-    adj_u(v) = 0;
-    union_adj = adj_v | adj_u;
+function [SS] = computeSS(clique, adj, X)
     
-    SS = zeros(size(X,1), 3 + sum(adj_v) + sum(adj_u) +  sum(union_adj) + sum(union_adj)*(sum(union_adj)-1)/2);
-    SS(:,1) = X(:,v).*X(:,u);
-    SS(:,2) = X(:,v);
-    SS(:,3) = X(:,u);
-    index = 4;
-    
-    SS(:,index:index+sum(adj_v) - 1) = X(:,(adj_v == 1)) .* repmat(X(:,v),1,sum(adj_v));
-    index = index + sum(adj_v);
-    
-    SS(:,index:index+sum(adj_u) - 1) = X(:,(adj_u == 1)) .* repmat(X(:,u),1,sum(adj_u));
-    index = index + sum(adj_u);
-    
-    SS(:, index:index+sum(union_adj) - 1) = X(:,union_adj == 1);
-    index = index + sum(union_adj);
-    
-    f = find(union_adj);
-    for i=1:length(f)
-       for j=i+1:length(f)
-           SS(:, index) = X(:, f(i)).*X(:, f(j));
-           index = index + 1;
-       end
+    SS = zeros(size(X,1), size(clique)  +  sum(union_adj) + sum(union_adj)*(sum(union_adj)-1)/2);
+
+    % each clique node
+    index = 1;
+    for i=1:size(clique)
+       SS(:,index) = X(:, i);
+       index = index + 1;
     end
     
-    SS = sum(SS,1);
+    % each clique node adjacent
+    for i=1:size(clique)
+        for j=1:size(find(adj(i)))
+            SS(:,index) = X(:, j);
+            index = index + 1;
+        end
+    end
     
+    % each node .* adj
+    for i=1:size(clique)
+        for j=1:size(find(adj(i)))
+            SS(:,index) = X(:, i) .* X(:, j);
+            index = index + 1;
+        end
+    end
+    
+    % adj .* adj
+    union_adj = size(adj,1);
+    for i=1:size(clique)
+        union_adj = union_adj | clique(i);
+    end
+    
+    union_idx = find(union_adj);
+    for i=1:size(union_idx)
+        for j=i+1:size(union_idx)
+            SS(:,index) = X(:,union_idx(i)) .* X(:,union_idx(j));
+        end
+    end
+    
+    SS = sum(SS, 1);
 end
