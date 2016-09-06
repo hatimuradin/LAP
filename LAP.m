@@ -8,7 +8,6 @@ numSamples = 1000;
 
 totalFeatures = graphHeight * graphWidth;
 
-
 adj = zeros(totalFeatures);
 for i=1:totalFeatures
     for j=1:totalFeatures
@@ -77,16 +76,17 @@ for i=1:totalFeatures
 end
 %%%%
 
-
 for c=1:length(cliques)
+    clqAdj = [];
+    for i=cliques{c}
+        clqAdj = [clqAdj; adj(i,:)]; 
+    end
     disp(['clique #' num2str(c)]);
     %%%% Newton
-    v = cliques{c}(1);
-    u = cliques{c}(2);
-    SS = computeSS(v, u, adj(v,:), adj(u,:),allSamples);
+    SS = computeSS(cliques{c}, clqAdj, allSamples);
     
     theta_0 = zeros(size(SS));
-    theta = my_newton(theta_0, SS, size(allSamples, 1), v, u, adj(v,:), adj(u,:),size(allSamples,2));
+    theta = my_newton(theta_0, SS, size(allSamples, 1), cliques{c}, clqAdj, size(allSamples,2));
     est_w2(v,u) = est_w2(v,u) + theta(1);
     est_w2_num(v,u) = est_w2_num(v,u)+1;
     est_w1(v) = est_w1(v) + theta(2);

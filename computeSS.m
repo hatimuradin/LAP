@@ -1,40 +1,49 @@
-function [SS] = computeSS(clique, adj, X)
+function [SS] = computeSS(clique, claAdj, X)
     
-    SS = zeros(size(X,1), size(clique)  +  sum(union_adj) + sum(union_adj)*(sum(union_adj)-1)/2);
+    claAdj(:,clique) = false;
+
+    union_adj = size(claAdj,1);
+    for i=1:size(clique)
+        union_adj = union_adj | clique(i);
+    end
+    
+    SS = zeros(size(X,1), length(clique)  + length(clique)*(length(clique) - 1)/2 + sum(sum(claAdj)) + sum(union_adj) + sum(union_adj)*(sum(union_adj)-1)/2);
 
     % each clique node
     index = 1;
-    for i=1:size(clique)
+    for i=clique
        SS(:,index) = X(:, i);
        index = index + 1;
     end
     
-    % each clique node adjacent
+    % each clique internal edge
     for i=1:size(clique)
-        for j=1:size(find(adj(i)))
-            SS(:,index) = X(:, j);
+        for j=i+1:size(clique)
+            SS(:,index) = X(:, clique(i))*X(:, clique(j));
             index = index + 1;
         end
     end
     
     % each node .* adj
-    for i=1:size(clique)
-        for j=1:size(find(adj(i)))
+    for i=clique
+        for j=find(claAdj(i))
             SS(:,index) = X(:, i) .* X(:, j);
             index = index + 1;
         end
     end
     
-    % adj .* adj
-    union_adj = size(adj,1);
-    for i=1:size(clique)
-        union_adj = union_adj | clique(i);
+    % each clique node adjacent
+    union_idx = find(union_adj);
+    for i=union_idx
+        SS(:,index) = X(:, i);
+        index = index + 1;
     end
     
-    union_idx = find(union_adj);
-    for i=1:size(union_idx)
-        for j=i+1:size(union_idx)
-            SS(:,index) = X(:,union_idx(i)) .* X(:,union_idx(j));
+    % adj .* adj
+    for i=union_idx
+        for j=union_idx
+            SS(:,index) = X(:,i) .* X(:,j);
+            index = index + 1;
         end
     end
     

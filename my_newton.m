@@ -1,12 +1,12 @@
-function theta = my_newton(theta_0,SS,n,v,u,adj_v,adj_u,d)
+function theta = my_newton(theta_0, SS, n, clique, clqAdj, d)
     
     MaxIter = 100;
     theta = theta_0;
     
     for iter = 1:MaxIter
         disp(['    iter #' num2str(iter)]);
-        logZ = compute_logZ(theta, v, u, adj_v, adj_u, length(adj_v));
-        [ESS, CovSS] = computeESS(theta, v, u, adj_v, adj_u, d, logZ);
+        logZ = compute_logZ(theta, clique, clqAdj, d);
+        [ESS, CovSS] = computeESS(theta, clique, clqAdj, d, logZ);
         grad = (SS - n*ESS)';
         H = -n*CovSS;
         H = vpa(H);
@@ -25,9 +25,9 @@ function theta = my_newton(theta_0,SS,n,v,u,adj_v,adj_u,d)
         beta = 0.7;
 
         t = 1;
-        current_log_likelihood = log_likelihood(SS, theta, v, u, adj_v, adj_u, d, n, logZ);
+        current_log_likelihood = log_likelihood(SS, theta, clique, clqAdj, d, n, logZ);
         while true
-            if log_likelihood(SS, theta + t*delta_theta, v, u, adj_v, adj_u, d, n) < current_log_likelihood + alpha*t*grad'*delta_theta'
+            if log_likelihood(SS, theta + t*delta_theta, clique, clqAdj, d, n) < current_log_likelihood + alpha*t*grad'*delta_theta'
                 t = beta*t;
             else
                 break;
